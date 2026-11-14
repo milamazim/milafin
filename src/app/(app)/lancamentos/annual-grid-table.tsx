@@ -57,13 +57,14 @@ export function AnnualGridTable({
                   </td>
                 </tr>
               )}
+              {/* categoria principal (com ou sem subcategorias) tem estilo de cabeçalho */}
               {section.rows.map((row) => (
-                <tr key={row.key} className={cn("border-b last:border-0", row.subtotal && "bg-muted/30 font-medium")}>
+                <tr key={row.key} className={cn("border-b last:border-0", row.depth === 0 && "bg-muted/30 font-medium")}>
                   <th
                     scope="row"
                     className={cn(
                       "sticky left-0 z-10 max-w-48 truncate px-3 py-1.5 text-left font-normal",
-                      row.subtotal ? "bg-muted font-medium" : "bg-background",
+                      row.depth === 0 ? "bg-muted font-medium" : "bg-background",
                       row.depth === 1 && "pl-7",
                       row.archived && "text-muted-foreground italic",
                     )}
