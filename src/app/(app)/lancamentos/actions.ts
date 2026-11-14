@@ -9,12 +9,20 @@ import { recurrences, transactions } from "@/db/schema";
 import { isValidISODate } from "@/domain/dates";
 import { DomainError } from "@/domain/errors";
 import { FREQUENCIES, isOccurrence, validateRule } from "@/domain/recurrence";
-import { planDeleteOccurrence, planEditOccurrence } from "@/domain/series-edit";
+import { planDeleteOccurrence, planEditOccurrence, planMarkPaidBefore } from "@/domain/series-edit";
 import { requireUser } from "@/lib/auth";
 import { isActive } from "@/lib/category-tree";
+import { todayISO } from "@/lib/format";
 import { parseBRL } from "@/lib/money";
 import { run, type ActionResult } from "@/server/action-result";
-import { getCategory, getTransaction, listCategories, loadOverrideRows, loadRecurrenceRow } from "@/server/queries";
+import {
+  getCategory,
+  getTransaction,
+  listCategories,
+  loadOverrideRows,
+  loadRecurrenceRow,
+  loadSeriesStartedBefore,
+} from "@/server/queries";
 import { executeSeriesOps } from "@/server/series-ops";
 
 /* ------------------------------------------------------------- validação */
@@ -220,6 +228,33 @@ export async function deleteOccurrence(input: {
       const target = await loadTarget(user.id, data.recurrenceId, data.recurrenceDate);
       await executeSeriesOps(user.id, planDeleteOccurrence({ ...target, scope: data.scope }));
       return undefined;
+    }),
+  );
+}
+
+/* ----------------------------------------- anteriores a hoje como pagas */
+
+/**
+ * Marca como pagas as ocorrências de séries com data anterior a hoje que
+ * ainda não foram pagas. Com `recurrenceId`, só daquela série; sem, de todas.
+ * Tudo numa transação. Devolve quantas ocorrências foram marcadas.
+ */
+export async function markPastPaid(input: { recurrenceId?: string } = {}): Promise<ActionResult<{ count: number }>> {
+  const user = await requireUser();
+  return done(
+    run(async () => {
+      const { recurrenceId } = parse(z.object({ recurrenceId: uuid.optional() }), input);
+      const today = todayISO();
+      let targets = await loadSeriesStartedBefore(user.id, today);
+      if (recurrenceId) {
+        targets = targets.filter((t) => t.series.id === recurrenceId);
+        if (!targets.length && !(await loadRecurrenceRow(user.id, recurrenceId))) {
+          throw new DomainError("Série não encontrada. Recarregue a tela.");
+        }
+      }
+      const ops = targets.flatMap((t) => planMarkPaidBefore({ ...t, before: today }));
+      if (ops.length) await executeSeriesOps(user.id, ops);
+      return { count: ops.length };
     }),
   );
 }

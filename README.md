@@ -8,7 +8,7 @@ A segunda parte deste documento descreve o **protótipo** (HTML único), que é 
 
 ## 🛠 Versão definitiva: desenvolvimento local
 
-**Stack:** Next.js 16 (App Router, TypeScript) · Supabase (Postgres + Auth) · Drizzle ORM + Server Actions · Tailwind CSS 4 + shadcn/ui · Vitest. O deploy previsto é na Vercel e no Supabase na nuvem, mas por enquanto **tudo roda localmente** (F6).
+**Stack:** Next.js 16 (App Router, TypeScript) · Supabase (Postgres + Auth) · Drizzle ORM + Server Actions · Tailwind CSS 4 + shadcn/ui · gráficos em SVG próprio (`src/components/charts`) · Vitest. O deploy previsto é na Vercel e no Supabase na nuvem, mas por enquanto **tudo roda localmente** (F6).
 
 ### Pré-requisitos
 
@@ -66,7 +66,7 @@ src/
   app/
     (auth)/          entrar, cadastro, esqueci-senha, redefinir-senha + Server Actions de auth
     (app)/           área logada: lancamentos (grade anual + lista do mês), categorias,
-                     dashboard, relatorios, dados
+                     dashboard (indicadores, gráficos, orçamento), relatorios, dados
                      (abas no topo a partir de tablet; barra inferior no celular)
     auth/confirm/    destino dos links enviados por e-mail (token_hash → sessão)
   db/                schema Drizzle (tabelas, RLS), conexão e checagem de tipos schema ↔ domínio

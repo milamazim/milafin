@@ -19,6 +19,17 @@
   --color-sidebar-foreground: var(--sidebar-foreground);
   --color-sidebar: var(--sidebar);
   --color-chart-5: var(--chart-5);
+  /* finanças e gráficos (paleta validada: scripts do skill dataviz) */
+  --color-receita: var(--receita);
+  --color-despesa: var(--despesa);
+  --color-receita-ink: var(--receita-ink);
+  --color-despesa-ink: var(--despesa-ink);
+  --color-viz-deemph: var(--viz-deemph);
+  --color-viz-grid: var(--viz-grid);
+  --color-viz-axis: var(--viz-axis);
+  --color-meter-track: var(--meter-track);
+  --color-status-warning: var(--status-warning);
+  --color-status-critical: var(--status-critical);
   --color-chart-4: var(--chart-4);
   --color-chart-3: var(--chart-3);
   --color-chart-2: var(--chart-2);
@@ -49,6 +60,19 @@
 }
 
 :root {
+  /* Receita × despesa = par divergente azul ↔ vermelho (CVD ΔE 21,6 claro).
+     Marcas usam --receita/--despesa; texto usa as variações -ink (contraste ≥ 4,5:1). */
+  --receita: #2a78d6;
+  --despesa: #e34948;
+  --receita-ink: #1c5cab;
+  --despesa-ink: #be123c;
+  --viz-deemph: #b5b3aa;
+  --viz-grid: #e1e0d9;
+  --viz-axis: #c3c2b7;
+  --meter-track: #e8f0fb;
+  --status-warning: #fab219;
+  --status-critical: #d03b3b;
+
   --background: oklch(1 0 0);
   --foreground: oklch(0.145 0 0);
   --card: oklch(1 0 0);
@@ -84,6 +108,18 @@
 }
 
 .dark {
+  /* modo escuro: degraus próprios validados contra o card (#171717), CVD ΔE 19,2 */
+  --receita: #3987e5;
+  --despesa: #e66767;
+  --receita-ink: #86b6ef;
+  --despesa-ink: #fb7185;
+  --viz-deemph: #5c5b56;
+  --viz-grid: #2c2c2a;
+  --viz-axis: #383835;
+  --meter-track: #1b2a40;
+  --status-warning: #fab219;
+  --status-critical: #e66767;
+
   --background: oklch(0.145 0 0);
   --foreground: oklch(0.985 0 0);
   --card: oklch(0.205 0 0);

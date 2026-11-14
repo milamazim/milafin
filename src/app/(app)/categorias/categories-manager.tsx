@@ -74,7 +74,7 @@ export function CategoriesManager({ categories, usage }: { categories: Category[
         <CardHeader>
           <CardTitle>Nenhuma categoria ainda</CardTitle>
         </CardHeader>
-        <CardContent className="grid gap-3 text-sm">
+        <CardContent className="grid grid-cols-1 gap-3 text-sm">
           <p className="text-muted-foreground">
             Comece com um conjunto sugerido (Renda, Moradia, Alimentação, Transporte, Saúde, Lazer) e ajuste depois, ou
             crie as suas do zero.

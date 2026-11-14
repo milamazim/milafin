@@ -144,7 +144,7 @@ Este documento reúne as decisões tomadas para reconstruir o **Controle Finance
 | F1 | Linguagem e framework | **TypeScript + Next.js (App Router)**, deploy na **Vercel** |
 | F2 | Autenticação | **Supabase Auth com e-mail e senha** (com recuperação de senha) |
 | F3 | Acesso ao banco | **Drizzle ORM + Server Actions**. Schema e migrações versionados no repositório, regras de negócio no servidor e **RLS** no Supabase como segunda camada de segurança |
-| F4 | Interface | **Tailwind CSS + shadcn/ui**, com gráficos em **Recharts** |
+| F4 | Interface | **Tailwind CSS + shadcn/ui**. Gráficos em **SVG próprio** (sem biblioteca; ver histórico de 14/11). Cores: receita = azul, despesa = vermelho (par validado para daltonismo), com degraus próprios no modo escuro |
 | F5 | Testes | **Só unitários (Vitest)**, focados na lógica de domínio: recorrências, saldos e centavos |
 | F6 | Ambiente de desenvolvimento | **Tudo local primeiro**: Next.js em `localhost` e **Supabase CLI local** (Docker Desktop), com Postgres, Auth, Mailpit e Studio. O deploy na Vercel e no Supabase na nuvem só acontece depois de validar localmente; a troca é feita apenas pelas variáveis de ambiente |
 
@@ -184,3 +184,5 @@ Este documento reúne as decisões tomadas para reconstruir o **Controle Finance
 | 2026-11-14 | E1–E2: grade anual + lista; tema do sistema + alternância | |
 | 2026-11-14 | F1–F5: TypeScript/Next.js, Supabase Auth (e-mail/senha), Drizzle + Server Actions, Tailwind + shadcn/ui, Vitest | |
 | 2026-11-14 | F6: desenvolvimento 100% local (Supabase CLI + Docker) antes de Vercel/Supabase na nuvem | |
+| 2026-11-14 | F4 revisado: gráficos em SVG próprio em vez de Recharts | Controle total das especificações de acessibilidade (colunas negativas, dica com todas as séries, teclado, tabela equivalente) sem dependência extra; o protótipo também usava SVG próprio |
+| 2026-11-14 | Cores: receita azul × despesa vermelho em todo o app | Verde × vermelho é o par que daltônicos não distinguem; azul × vermelho passou no validador (ΔE 21,6 claro / 19,2 escuro) |
