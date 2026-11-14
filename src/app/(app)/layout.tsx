@@ -15,7 +15,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
   return (
     <div className="flex min-h-dvh flex-col">
       <header className="sticky top-0 z-30 border-b bg-background/90 backdrop-blur">
-        <div className="mx-auto flex h-14 max-w-7xl items-center gap-4 px-4">
+        <div className="mx-auto flex h-14 max-w-screen-2xl items-center gap-4 px-4">
           <Link href="/lancamentos" className="font-semibold tracking-tight whitespace-nowrap">
             💰 milafin
           </Link>
@@ -28,7 +28,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
           </div>
         </div>
       </header>
-      <main className="mx-auto w-full max-w-7xl flex-1 p-4 pb-24 md:pb-4">{children}</main>
+      <main className="mx-auto w-full max-w-screen-2xl flex-1 p-4 pb-24 md:pb-4">{children}</main>
       <BottomNav />
     </div>
   );
