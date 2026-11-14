@@ -5,6 +5,7 @@ import {
   DEFAULT_EDIT_SCOPE,
   planDeleteOccurrence,
   planEditOccurrence,
+  planMarkPaidBefore,
   type EditScope,
   type OccurrenceEdit,
 } from "./series-edit";
@@ -269,6 +270,70 @@ describe("editar ocorrência: toda a série", () => {
     expect(() => runEdit(base(), "2026-05-10", edit({ frequency: "anual" }), "toda")).toThrow("deste em diante");
     const fev = { recurrences: [aluguel({ startDate: "2026-02-10", excludedDates: [] })], transactions: [] };
     expect(() => runEdit(fev, "2026-05-10", edit({ date: "2026-05-31" }), "toda")).toThrow("primeiro mês");
+  });
+});
+
+describe("marcar anteriores a hoje como pagas", () => {
+  const run = (db: MemoryDb, before: string) => {
+    const ops = planMarkPaidBefore({ series: db.recurrences[0], overrides: db.transactions, before });
+    const after = applyOps(db, ops);
+    return { ops, after, view: view(after) };
+  };
+
+  it("marca as calculadas antes de hoje, sem tocar em hoje, no futuro e nas exclusões", () => {
+    const { view: v } = run(base(), "2026-05-10");
+    expect(v).toEqual([
+      ["2026-01-10", 2800, true],
+      ["2026-02-10", 2800, true],
+      // março excluído continua fora
+      ["2026-04-10", 2800, true],
+      ["2026-05-10", 2800, false], // hoje: não é "anterior"
+      ["2026-06-10", 2800, false],
+      ["2026-07-10", 2800, false],
+      ["2026-08-10", 2800, false],
+    ]);
+  });
+
+  it("ocorrência editada não paga só ganha o pago (valor mantido); a já paga não muda", () => {
+    const db: MemoryDb = {
+      ...base(),
+      transactions: [
+        override({ id: "fev", amountCents: 310000, paid: false }),
+        override({ id: "jan", recurrenceDate: "2026-01-10", date: "2026-01-10", paid: true }),
+      ],
+    };
+    const { ops, view: v } = run(db, "2026-03-01");
+    expect(ops).toEqual([{ type: "updateTransaction", id: "fev", patch: { paid: true } }]);
+    expect(v.slice(0, 2)).toEqual([
+      ["2026-01-10", 2800, true],
+      ["2026-02-10", 3100, true],
+    ]);
+  });
+
+  it("respeita ocorrências movidas: para o futuro não marca; para o passado marca", () => {
+    const db: MemoryDb = {
+      ...base(),
+      transactions: [
+        override({ id: "abr-futuro", recurrenceDate: "2026-04-10", date: "2026-06-01", paid: false }),
+        override({ id: "jun-passado", recurrenceDate: "2026-06-10", date: "2026-04-20", paid: false }),
+      ],
+    };
+    const { after } = run(db, "2026-05-01");
+    expect(after.transactions.find((t) => t.id === "abr-futuro")!.paid).toBe(false);
+    expect(after.transactions.find((t) => t.id === "jun-passado")!.paid).toBe(true);
+    // abril não ganha uma segunda linha (já tem substituição)
+    expect(after.transactions.filter((t) => t.recurrenceDate === "2026-04-10")).toHaveLength(1);
+  });
+
+  it("série que ainda não começou ou já tudo pago: nada a fazer", () => {
+    expect(run(base(), "2026-01-10").ops).toEqual([]);
+    const { after } = run(base(), "2026-03-01");
+    expect(planMarkPaidBefore({ series: after.recurrences[0], overrides: after.transactions, before: "2026-03-01" })).toEqual([]);
+  });
+
+  it("série com fim: não passa do fim", () => {
+    const db: MemoryDb = { recurrences: [aluguel({ endDate: "2026-02-28", excludedDates: [] })], transactions: [] };
+    expect(run(db, "2026-12-01").ops).toHaveLength(2);
   });
 });
 

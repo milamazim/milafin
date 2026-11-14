@@ -33,6 +33,7 @@ import {
   lastScheduledDate,
   monthStepOf,
   nthDate,
+  occurrenceDates,
   validateRule,
   type Frequency,
   type RecurrenceRule,
@@ -262,6 +263,56 @@ function planSplit(
   );
 
   if (edit.paid) ops.push({ type: "upsertOverride", values: overrideValues(id, edit.date, edit) });
+  return ops;
+}
+
+/* ------------------------------------------- marcar anteriores como pagas */
+
+/**
+ * Marca como pagas todas as ocorrências da série com data efetiva ANTERIOR a
+ * `before` (normalmente hoje) que ainda não estão pagas. Útil ao começar a
+ * usar o app com séries que vêm do passado.
+ * - ocorrência calculada → vira substituição com os valores da série + pago;
+ * - ocorrência editada não paga → só recebe `paid: true` (valores mantidos);
+ * - exclusões, ocorrências já pagas e as movidas para hoje ou depois ficam
+ *   como estão.
+ */
+export function planMarkPaidBefore(input: {
+  series: RecurrenceRow;
+  overrides: readonly TransactionRow[];
+  before: ISODate;
+}): SeriesOp[] {
+  const { series, overrides, before } = input;
+  if (!isValidISODate(before)) throw new DomainError("Data inválida.");
+  if (overrides.some((o) => o.recurrenceId !== series.id)) {
+    throw new DomainError("Substituição de outra série recebida por engano.");
+  }
+  const ops: SeriesOp[] = [];
+
+  // ocorrências editadas (podem ter sido movidas de data)
+  for (const o of overrides) {
+    if (!o.paid && o.date < before) ops.push({ type: "updateTransaction", id: o.id, patch: { paid: true } });
+  }
+
+  // ocorrências calculadas sem substituição
+  if (before > series.startDate) {
+    const overridden = new Set(overrides.map((o) => o.recurrenceDate));
+    for (const date of occurrenceDates(series, series.startDate, addDays(before, -1))) {
+      if (overridden.has(date)) continue;
+      ops.push({
+        type: "upsertOverride",
+        values: {
+          recurrenceId: series.id,
+          recurrenceDate: date,
+          categoryId: series.categoryId,
+          amountCents: series.amountCents,
+          date,
+          paid: true,
+          note: series.note,
+        },
+      });
+    }
+  }
   return ops;
 }
 

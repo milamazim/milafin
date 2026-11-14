@@ -1,6 +1,6 @@
 import "server-only";
 
-import { and, asc, between, count, eq, gte, isNull, lte, or } from "drizzle-orm";
+import { and, asc, between, count, eq, gte, isNotNull, isNull, lt, lte, or } from "drizzle-orm";
 
 import { db } from "@/db";
 import { categories, recurrences, transactions } from "@/db/schema";
@@ -132,6 +132,24 @@ export async function loadPeriod(
 export async function loadRecurrenceRow(userId: string, id: string): Promise<RecurrenceRow | null> {
   const r = await getRecurrence(userId, id);
   return r ? toRecurrenceRow(r) : null;
+}
+
+/** Séries que começaram antes de `before`, com todas as suas substituições. */
+export async function loadSeriesStartedBefore(userId: string, before: ISODate) {
+  const [recs, overrides] = await Promise.all([
+    db
+      .select()
+      .from(recurrences)
+      .where(and(eq(recurrences.userId, userId), lt(recurrences.startDate, before))),
+    db
+      .select()
+      .from(transactions)
+      .where(and(eq(transactions.userId, userId), isNotNull(transactions.recurrenceId))),
+  ]);
+  return recs.map((r) => ({
+    series: toRecurrenceRow(r),
+    overrides: overrides.filter((o) => o.recurrenceId === r.id).map(toTransactionRow),
+  }));
 }
 
 export async function loadOverrideRows(userId: string, recurrenceId: string): Promise<TransactionRow[]> {

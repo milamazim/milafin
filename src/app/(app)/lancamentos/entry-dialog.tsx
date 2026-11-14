@@ -29,10 +29,11 @@ import type { Occurrence, RecurrenceRow } from "@/domain/occurrences";
 import { FREQUENCIES, FREQUENCY_LABEL, type Frequency } from "@/domain/recurrence";
 import { DEFAULT_EDIT_SCOPE, EDIT_SCOPE_LABEL, type EditScope } from "@/domain/series-edit";
 import { categoryOptions, categoryPath } from "@/lib/category-tree";
-import { describeRule, formatDate } from "@/lib/format";
+import { describeRule, formatDate, todayISO } from "@/lib/format";
 import { centsToInput } from "@/lib/money";
 
 import { createEntry, deleteOccurrence, deleteTransaction, editOccurrence, updateTransaction } from "./actions";
+import { MarkPastPaidButton } from "./mark-past-paid";
 
 export type EntryDialogState =
   | { mode: "create"; date: ISODate; categoryId?: string }
@@ -256,6 +257,13 @@ function EntryForm({
             </RadioGroup>
             {scope === "deste-em-diante" && <FrequencySelect value={frequency} onChange={setFrequency} />}
           </fieldset>
+        )}
+
+        {occ?.recurrenceId && series && series.startDate < todayISO() && (
+          <div className="flex flex-wrap items-center justify-between gap-2 rounded-lg border border-dashed p-3 text-xs text-muted-foreground">
+            <span>Começou a usar o app com esta série já em andamento?</span>
+            <MarkPastPaidButton recurrenceId={series.id} label="Marcar anteriores a hoje como pagas" onDone={onClose} />
+          </div>
         )}
 
         <div className="grid gap-1.5">
