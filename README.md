@@ -54,6 +54,8 @@ Crie uma conta em `/cadastro`. O e-mail de confirmação **não é enviado de ve
 
 O schema é a fonte da verdade. Não edite as migrações já aplicadas.
 
+Mudanças em `supabase/config.toml` ou em `supabase/templates/` (e-mails) só valem depois de reiniciar o Supabase: `npm run db:stop` e `npm run db:start`. Os dados locais são preservados.
+
 ### Estrutura
 
 ```
@@ -61,6 +63,7 @@ src/
   app/
     (auth)/          entrar, cadastro, esqueci-senha, redefinir-senha + Server Actions de auth
     (app)/           área logada: lancamentos, dashboard, relatorios, categorias, dados
+                     (abas no topo a partir de tablet; barra inferior no celular)
     auth/confirm/    destino dos links enviados por e-mail (token_hash → sessão)
   db/                schema Drizzle (tabelas, RLS) e conexão
   lib/               auth (requireUser), clientes Supabase, dinheiro em centavos

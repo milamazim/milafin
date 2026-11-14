@@ -1,6 +1,8 @@
 import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
 
+import { HOME } from "@/lib/safe-next";
+
 import { supabaseEnv } from "./env";
 
 /** Rotas acessíveis sem login. */
@@ -47,7 +49,7 @@ export async function updateSession(request: NextRequest) {
 
   if (loggedIn && (pathname === "/entrar" || pathname === "/cadastro")) {
     const to = request.nextUrl.clone();
-    to.pathname = "/";
+    to.pathname = HOME;
     to.search = "";
     return redirectWithCookies(to, response);
   }

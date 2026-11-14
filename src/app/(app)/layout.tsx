@@ -3,7 +3,7 @@ import { Suspense } from "react";
 
 import { ThemeToggle } from "@/components/theme-toggle";
 
-import { MainNav } from "./main-nav";
+import { BottomNav, MainNav } from "./main-nav";
 import { UserMenu } from "./user-menu";
 
 /**
@@ -28,7 +28,8 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
           </div>
         </div>
       </header>
-      <main className="mx-auto w-full max-w-7xl flex-1 p-4">{children}</main>
+      <main className="mx-auto w-full max-w-7xl flex-1 p-4 pb-24 md:pb-4">{children}</main>
+      <BottomNav />
     </div>
   );
 }

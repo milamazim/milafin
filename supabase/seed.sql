@@ -1,0 +1,2 @@
+-- Dados iniciais do banco LOCAL, aplicados em `npm run db:reset`.
+-- Vazio de propósito: cada usuário cria as próprias categorias no app.

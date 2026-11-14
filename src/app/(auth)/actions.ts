@@ -1,9 +1,10 @@
 "use server";
 
+import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { z } from "zod";
 
-import { safeNext } from "@/lib/safe-next";
+import { HOME, safeNext } from "@/lib/safe-next";
 import { createClient } from "@/lib/supabase/server";
 
 export type FormState = { error?: string; message?: string; email?: string } | undefined;
@@ -49,7 +50,19 @@ export async function signIn(_: FormState, formData: FormData): Promise<FormStat
   const { error } = await supabase.auth.signInWithPassword(parsed.data);
   if (error) return { error: authError(error.code, "Não foi possível entrar."), email: parsed.data.email };
 
-  redirect(safeNext(formData.get("next")));
+  redirect(await nextFromReferer());
+}
+
+/** Lê o `?next=` da página de login que enviou o formulário (mesma origem). */
+async function nextFromReferer() {
+  const h = await headers();
+  try {
+    const referer = new URL(h.get("referer") ?? "");
+    if (referer.host !== h.get("host")) return HOME;
+    return safeNext(referer.searchParams.get("next"));
+  } catch {
+    return HOME;
+  }
 }
 
 export async function signUp(_: FormState, formData: FormData): Promise<FormState> {
@@ -71,7 +84,7 @@ export async function signUp(_: FormState, formData: FormData): Promise<FormStat
   if (error) return { error: authError(error.code, "Não foi possível criar a conta."), email: parsed.data.email };
 
   // Com confirmação de e-mail desligada, o Supabase já devolve a sessão.
-  if (data.session) redirect("/");
+  if (data.session) redirect(HOME);
 
   return {
     message: `Enviamos um link de confirmação para ${parsed.data.email}. Abra o e-mail para ativar sua conta.`,
@@ -105,7 +118,7 @@ export async function updatePassword(_: FormState, formData: FormData): Promise<
   const { error } = await supabase.auth.updateUser({ password: parsed.data.password });
   if (error) return { error: authError(error.code, "Não foi possível alterar a senha. Peça um novo link.") };
 
-  redirect("/");
+  redirect(HOME);
 }
 
 export async function signOut() {

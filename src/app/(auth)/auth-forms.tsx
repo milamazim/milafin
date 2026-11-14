@@ -45,16 +45,10 @@ function Feedback({ state }: { state: FormState }) {
 
 const passwordHint = "Mínimo de 8 caracteres, com letras e números.";
 
-export function SignInForm({ next, linkError }: { next?: string; linkError?: boolean }) {
+export function SignInForm() {
   const [state, action, pending] = useActionState(signIn, undefined);
   return (
     <form action={action} className="grid gap-4">
-      {linkError && !state && (
-        <p role="alert" className="text-sm text-destructive">
-          O link é inválido ou expirou. Tente novamente.
-        </p>
-      )}
-      <input type="hidden" name="next" value={next ?? "/"} />
       <Field label="E-mail" name="email" type="email" autoComplete="email" defaultValue={state?.email} />
       <Field label="Senha" name="password" type="password" autoComplete="current-password" />
       <Feedback state={state} />
