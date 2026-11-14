@@ -15,6 +15,8 @@ A segunda parte deste documento descreve o **protótipo** (HTML único), que é 
 - **Node.js** 22 ou superior (testado com o 26)
 - **Docker Desktop** em execução (o Supabase local roda em containers)
 
+> **Memória:** o Supabase Studio (painel web) está desligado em `supabase/config.toml` para economizar cerca de 430 MB. Assim, o Supabase local cabe em cerca de 0,8 GB, e o WSL desta máquina está limitado a 1,5 GB via `%UserProfile%\.wslconfig`. Para ver as tabelas, use `npm run db:studio`.
+
 ### Primeira execução
 
 ```bash
@@ -29,7 +31,7 @@ Crie uma conta em `/cadastro`. O e-mail de confirmação **não é enviado de ve
 | Serviço local | Endereço |
 |---|---|
 | App | http://localhost:3000 |
-| Supabase Studio (tabelas, usuários) | http://127.0.0.1:54323 |
+| Drizzle Studio (tabelas): `npm run db:studio` | https://local.drizzle.studio |
 | Mailpit (e-mails de cadastro e senha) | http://127.0.0.1:54324 |
 | API do Supabase | http://127.0.0.1:54321 |
 | Postgres | `postgresql://postgres:postgres@127.0.0.1:54322/postgres` |
@@ -43,6 +45,7 @@ Crie uma conta em `/cadastro`. O e-mail de confirmação **não é enviado de ve
 | `npm run typecheck` / `npm run lint` | Checagem de tipos e lint |
 | `npm run db:start` / `db:stop` / `db:status` | Liga, desliga e mostra o status do Supabase local |
 | `npm run db:generate` | Gera uma migração SQL a partir de `src/db/schema.ts` |
+| `npm run db:studio` | Abre o Drizzle Studio para ver e editar as tabelas |
 | `npm run db:reset` | Recria o banco local aplicando todas as migrações (**apaga os dados locais**) |
 | `npm run env:local` | (Re)gera o `.env.local` a partir do Supabase local |
 

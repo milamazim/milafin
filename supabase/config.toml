@@ -94,7 +94,8 @@ enabled = false
 # max_header_length = 4096
 
 [studio]
-enabled = true
+# Desligado para economizar ~430 MB de RAM (Studio + pg_meta). Tabelas: `npm run db:studio` (Drizzle Studio).
+enabled = false
 # Port to use for Supabase Studio.
 port = 54323
 # External URL of the API server that frontend connects to.
