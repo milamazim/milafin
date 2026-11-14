@@ -433,3 +433,26 @@ enabled = true
 # formatted with uppercase keywords, indent 2, max width 180, trailing commas,
 # and column/key alignment. Set to "null" to emit raw, unformatted SQL.
 # format_options = "{\"keywordCase\":\"upper\",\"indent\":2,\"maxWidth\":180,\"commaStyle\":\"trailing\"}"
+
+# ---------------------------------------------------------------------------
+# Projeto na nuvem (produção): sobrescreve só o que difere do ambiente local.
+# Aplicar com `npx supabase config push` (revise antes com `config diff`).
+[remotes.production]
+project_id = "wpxwaliithickpuynqrm"
+
+[remotes.production.auth]
+site_url = "https://milafin.vercel.app"
+additional_redirect_urls = ["https://milafin.vercel.app/**"]
+
+# Em produção: 1 e-mail por minuto por usuário (o "1s" acima é só para testes locais)
+[remotes.production.auth.email]
+max_frequency = "1m0s"
+
+# Mantém os valores definidos pelo Supabase para o plano do projeto
+[remotes.production.db.pooler]
+default_pool_size = 15
+max_client_conn = 200
+
+# Recurso não usado pelo app
+[remotes.production.storage.vector]
+enabled = false
