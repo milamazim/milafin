@@ -10,6 +10,11 @@ const num = new Intl.NumberFormat("pt-BR", { minimumFractionDigits: 2, maximumFr
 /** 123456 → "1.234,56" (sem "R$", para a grade). */
 export const formatNumber = (cents: number) => num.format(cents / 100);
 
+const whole = new Intl.NumberFormat("pt-BR", { maximumFractionDigits: 0 });
+
+/** 123456 → "1.235" (reais inteiros, arredondados; visão compacta da grade). */
+export const formatWhole = (cents: number) => whole.format(Math.round(cents / 100));
+
 /** "2026-03-05" → "05/03/2026" */
 export function formatDate(iso: ISODate): string {
   const { y, m, d } = parseISO(iso);
