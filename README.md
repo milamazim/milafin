@@ -1,12 +1,91 @@
 # 💰 Controle Financeiro Anual (milafin)
 
+Controle de finanças pessoais. A **versão definitiva** está sendo construída em Next.js + Supabase. As decisões de requisitos e de stack estão em [`REQUISITOS.md`](REQUISITOS.md).
+
+A segunda parte deste documento descreve o **protótipo** (HTML único), que é a referência funcional da nova versão.
+
+---
+
+## 🛠 Versão definitiva: desenvolvimento local
+
+**Stack:** Next.js 16 (App Router, TypeScript) · Supabase (Postgres + Auth) · Drizzle ORM + Server Actions · Tailwind CSS 4 + shadcn/ui · Vitest. O deploy previsto é na Vercel e no Supabase na nuvem, mas por enquanto **tudo roda localmente** (F6).
+
+### Pré-requisitos
+
+- **Node.js** 22 ou superior (testado com o 26)
+- **Docker Desktop** em execução (o Supabase local roda em containers)
+
+> **Memória:** o Supabase Studio (painel web) está desligado em `supabase/config.toml` para economizar cerca de 430 MB. Assim, o Supabase local cabe em cerca de 0,8 GB, e o WSL desta máquina está limitado a 1,5 GB via `%UserProfile%\.wslconfig`. Para ver as tabelas, use `npm run db:studio`.
+
+### Primeira execução
+
+```bash
+npm install
+npm run db:start      # sobe o Supabase local e aplica as migrações (1ª vez: baixa as imagens)
+npm run env:local     # gera o .env.local com URL, chave e conexão do banco local
+npm run dev           # http://localhost:3000
+```
+
+Crie uma conta em `/cadastro`. O e-mail de confirmação **não é enviado de verdade**: ele cai no **Mailpit**.
+
+| Serviço local | Endereço |
+|---|---|
+| App | http://localhost:3000 |
+| Drizzle Studio (tabelas): `npm run db:studio` | https://local.drizzle.studio |
+| Mailpit (e-mails de cadastro e senha) | http://127.0.0.1:54324 |
+| API do Supabase | http://127.0.0.1:54321 |
+| Postgres | `postgresql://postgres:postgres@127.0.0.1:54322/postgres` |
+
+### Scripts
+
+| Comando | O que faz |
+|---|---|
+| `npm run dev` | Servidor de desenvolvimento |
+| `npm test` / `npm run test:watch` | Testes unitários (Vitest) |
+| `npm run typecheck` / `npm run lint` | Checagem de tipos e lint |
+| `npm run db:start` / `db:stop` / `db:status` | Liga, desliga e mostra o status do Supabase local |
+| `npm run db:generate` | Gera uma migração SQL a partir de `src/db/schema.ts` |
+| `npm run db:studio` | Abre o Drizzle Studio para ver e editar as tabelas |
+| `npm run db:reset` | Recria o banco local aplicando todas as migrações (**apaga os dados locais**) |
+| `npm run env:local` | (Re)gera o `.env.local` a partir do Supabase local |
+
+### Alterando o banco
+
+1. Edite `src/db/schema.ts`.
+2. Rode `npm run db:generate`. A migração é criada em `supabase/migrations/`.
+3. Rode `npm run db:reset` para aplicá-la no banco local.
+
+O schema é a fonte da verdade. Não edite as migrações já aplicadas.
+
+Mudanças em `supabase/config.toml` ou em `supabase/templates/` (e-mails) só valem depois de reiniciar o Supabase: `npm run db:stop` e `npm run db:start`. Os dados locais são preservados.
+
+### Estrutura
+
+```
+src/
+  app/
+    (auth)/          entrar, cadastro, esqueci-senha, redefinir-senha + Server Actions de auth
+    (app)/           área logada: lancamentos, dashboard, relatorios, categorias, dados
+                     (abas no topo a partir de tablet; barra inferior no celular)
+    auth/confirm/    destino dos links enviados por e-mail (token_hash → sessão)
+  db/                schema Drizzle (tabelas, RLS) e conexão
+  lib/               auth (requireUser), clientes Supabase, dinheiro em centavos
+  proxy.ts           renova a sessão e redireciona quem não está logado
+supabase/
+  config.toml        configuração do Supabase local (auth, portas)
+  migrations/        SQL gerado pelo Drizzle
+  templates/         e-mails de confirmação e recuperação (pt-BR)
+```
+
+**Segurança:** o servidor acessa o banco via Drizzle e **sempre filtra por `user_id`** do `requireUser()`. A RLS do Supabase (cada usuário só acessa as próprias linhas) é a segunda camada.
+
+---
+
+# 🧪 Protótipo (referência)
+
 Protótipo de controle financeiro pessoal: um **único arquivo HTML** que roda direto no navegador, sem instalação e sem servidor.
 
 Você lança receitas e despesas numa grade anual, com os meses nas colunas. O sistema calcula subtotais, o saldo do mês e o saldo acumulado, e mostra um dashboard do ano.
-
-> As decisões de requisitos para a versão definitiva estão em [`REQUISITOS.md`](REQUISITOS.md).
-
----
 
 ## Sumário
 
@@ -27,8 +106,8 @@ Você lança receitas e despesas numa grade anual, com os meses nas colunas. O s
 |---|---|
 | `Prototype/controle_financeiro_FINAL.html` | **Versão final do protótipo.** Todo o app (HTML, CSS e JavaScript) num só arquivo. |
 | `Prototype/controle_financeiro_V1.html` | Primeiro protótipo, mantido só como referência. |
-| `README.md` | Este documento: funcionalidades e características do protótipo. |
-| `REQUISITOS.md` | Decisões de requisitos em aberto para a versão definitiva. |
+| `README.md` | Este documento: desenvolvimento da nova versão e referência do protótipo. |
+| `REQUISITOS.md` | Decisões de requisitos e de stack da versão definitiva. |
 
 ---
 
