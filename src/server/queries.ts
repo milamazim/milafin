@@ -1,6 +1,6 @@
 import "server-only";
 
-import { and, asc, between, count, eq, gte, isNotNull, isNull, lt, lte, or } from "drizzle-orm";
+import { and, asc, between, count, eq, gte, isNotNull, isNull, lt, lte, max, min, or } from "drizzle-orm";
 
 import { db } from "@/db";
 import { categories, recurrences, transactions } from "@/db/schema";
@@ -132,6 +132,51 @@ export async function loadPeriod(
 export async function loadRecurrenceRow(userId: string, id: string): Promise<RecurrenceRow | null> {
   const r = await getRecurrence(userId, id);
   return r ? toRecurrenceRow(r) : null;
+}
+
+/** Todos os dados do usuário, no formato do backup. */
+export async function exportAll(userId: string) {
+  const [cats, recs, txs] = await Promise.all([
+    db.select().from(categories).where(eq(categories.userId, userId)).orderBy(asc(categories.createdAt)),
+    db.select().from(recurrences).where(eq(recurrences.userId, userId)).orderBy(asc(recurrences.createdAt)),
+    db.select().from(transactions).where(eq(transactions.userId, userId)).orderBy(asc(transactions.date)),
+  ]);
+  return {
+    categories: cats.map((c) => ({
+      id: c.id,
+      parentId: c.parentId,
+      name: c.name,
+      kind: c.kind,
+      monthlyLimitCents: c.monthlyLimitCents,
+      sortOrder: c.sortOrder,
+      archivedAt: c.archivedAt ? c.archivedAt.toISOString() : null,
+    })),
+    recurrences: recs.map(toRecurrenceRow).map((r) => ({ ...r, excludedDates: [...r.excludedDates] })),
+    transactions: txs.map(toTransactionRow),
+  };
+}
+
+/** Quantidades e anos com dados (para a tela Dados). */
+export async function dataStatus(userId: string) {
+  const [[c], [r], [t]] = await Promise.all([
+    db.select({ n: count() }).from(categories).where(eq(categories.userId, userId)),
+    db
+      .select({ n: count(), first: min(recurrences.startDate) })
+      .from(recurrences)
+      .where(eq(recurrences.userId, userId)),
+    db
+      .select({ n: count(), first: min(transactions.date), last: max(transactions.date) })
+      .from(transactions)
+      .where(eq(transactions.userId, userId)),
+  ]);
+  const firsts = [r.first, t.first].filter((x): x is string => Boolean(x));
+  return {
+    categories: c.n,
+    recurrences: r.n,
+    transactions: t.n,
+    firstYear: firsts.length ? Number(firsts.sort()[0].slice(0, 4)) : null,
+    lastYear: t.last ? Number(t.last.slice(0, 4)) : null,
+  };
 }
 
 /** Séries que começaram antes de `before`, com todas as suas substituições. */

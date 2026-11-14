@@ -41,8 +41,9 @@ describe("category-tree", () => {
   });
 
   it("opções de lançamento: subcategorias ativas e categorias sem filhas", () => {
+    // categoria sem subcategorias (Lazer) vira um grupo próprio, em ordem alfabética
     expect(categoryOptions(cats)).toEqual([
-      { label: "Despesas", kind: "despesa", options: [{ id: "laz", label: "Lazer" }] },
+      { label: "Lazer", kind: "despesa", options: [{ id: "laz", label: "Lazer" }] },
       { label: "Moradia", kind: "despesa", options: [{ id: "alu", label: "Aluguel" }, { id: "luz", label: "Luz" }] },
       { label: "Renda", kind: "receita", options: [{ id: "sal", label: "Salário" }] },
     ]);

@@ -66,13 +66,14 @@ src/
   app/
     (auth)/          entrar, cadastro, esqueci-senha, redefinir-senha + Server Actions de auth
     (app)/           área logada: lancamentos (grade anual + lista do mês), categorias,
-                     dashboard (indicadores, gráficos, orçamento), relatorios, dados
+                     dashboard (indicadores, gráficos, orçamento), relatorios,
+                     dados (backup .json, restaurar, CSV por ano, apagar tudo)
                      (abas no topo a partir de tablet; barra inferior no celular)
     auth/confirm/    destino dos links enviados por e-mail (token_hash → sessão)
   db/                schema Drizzle (tabelas, RLS), conexão e checagem de tipos schema ↔ domínio
   domain/            regras de negócio puras (sem banco/React), todas com testes:
                      datas, recorrências, ocorrências, edição de séries, saldos e orçamento
-  lib/               auth (requireUser), clientes Supabase, dinheiro em centavos,
+  lib/               auth (requireUser), clientes Supabase, dinheiro em centavos, backup e CSV,
                      árvore de categorias e modelo da grade anual (com testes)
   server/            consultas (sempre filtradas por user_id) e executor dos planos de série
   proxy.ts           renova a sessão e redireciona quem não está logado

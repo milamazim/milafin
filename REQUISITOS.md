@@ -116,6 +116,7 @@ Este documento reúne as decisões tomadas para reconstruir o **Controle Finance
 ### D2. Manter exportação para CSV/Excel e backup por arquivo?
 - **Status:** ✅ Decidido
 - **Decisão:** **Manter as duas coisas:** backup completo em `.json` (exportar e restaurar) e exportação de CSV para o Excel.
+- **Implementação (etapa 5):** backup `.json` próprio (versão 1, sem `user_id` e sem investimentos). A restauração tem dois modos: **Mesclar** (padrão), que não duplica nada, junta categorias de mesmo nome e pode ser repetida sem efeito, e **Substituir tudo**, com confirmação. Tudo numa transação, com limite de 3,5 MB por arquivo. O CSV tem um arquivo por ano, com as séries expandidas, separador `;`, vírgula decimal, UTF-8 com BOM e proteção contra fórmulas. Há também a opção de apagar todos os dados (é preciso digitar APAGAR). O formato do protótipo não é importado (D1).
 
 ---
 
@@ -186,3 +187,4 @@ Este documento reúne as decisões tomadas para reconstruir o **Controle Finance
 | 2026-11-14 | F6: desenvolvimento 100% local (Supabase CLI + Docker) antes de Vercel/Supabase na nuvem | |
 | 2026-11-14 | F4 revisado: gráficos em SVG próprio em vez de Recharts | Controle total das especificações de acessibilidade (colunas negativas, dica com todas as séries, teclado, tabela equivalente) sem dependência extra; o protótipo também usava SVG próprio |
 | 2026-11-14 | Cores: receita azul × despesa vermelho em todo o app | Verde × vermelho é o par que daltônicos não distinguem; azul × vermelho passou no validador (ΔE 21,6 claro / 19,2 escuro) |
+| 2026-11-14 | D2 implementado: backup .json (mesclar/substituir), CSV por ano, apagar todos os dados | Etapa 5 |

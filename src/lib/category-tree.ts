@@ -64,29 +64,19 @@ export function categoryOptions<C extends CategoryLike>(all: readonly C[], keepI
   for (const kind of ["despesa", "receita"] as const) {
     for (const node of buildTree(all, { includeArchived: true })[kind]) {
       const parentActive = isActive(node.category, all);
-      const children = node.children.filter((c) => isActive(c, all) || c.id === keepId);
       const activeChildren = node.children.filter((c) => isActive(c, all));
-      if (children.length > 0) {
-        groups.push({ label: node.category.name, kind, options: children.map((c) => ({ id: c.id, label: c.name })) });
-      }
-      // categoria sem subcategorias ativas recebe lançamentos direto
+      const options = node.children
+        .filter((c) => isActive(c, all) || c.id === keepId)
+        .map((c) => ({ id: c.id, label: c.name }));
+      // categoria sem subcategorias ativas recebe lançamentos direto: entra no
+      // próprio grupo, na mesma ordem alfabética das outras categorias
       if ((parentActive && activeChildren.length === 0) || node.category.id === keepId) {
-        groups.push({
-          label: KIND_LABEL[kind],
-          kind,
-          options: [{ id: node.category.id, label: node.category.name }],
-        });
+        options.unshift({ id: node.category.id, label: node.category.name });
       }
+      if (options.length > 0) groups.push({ label: node.category.name, kind, options });
     }
   }
-  // junta as categorias "soltas" num grupo por natureza
-  const merged: CategoryOptionGroup[] = [];
-  for (const g of groups) {
-    const prev = merged.find((m) => m.label === g.label && m.kind === g.kind);
-    if (prev) prev.options.push(...g.options);
-    else merged.push({ ...g, options: [...g.options] });
-  }
-  return merged;
+  return groups;
 }
 
 /** "Moradia › Aluguel" */
