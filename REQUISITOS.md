@@ -1,6 +1,6 @@
 # 🧭 Decisões de requisitos: versão definitiva
 
-Este documento reúne as decisões tomadas para reconstruir o **Controle Financeiro Anual** de forma mais robusta. O ponto de partida é o protótipo `Prototype/controle_financeiro_FINAL.html`, descrito no [`README.md`](README.md).
+Este documento reúne as decisões tomadas para reconstruir o **Controle Financeiro Anual** de forma mais robusta. O ponto de partida foi um protótipo anterior (um app em HTML único, com dados salvos no navegador), que não faz parte deste repositório. O funcionamento da versão atual está descrito no [`README.md`](README.md).
 
 **Como usar:** cada pergunta tem um campo **Decisão** e um **Status** (⏳ *Pendente* / ✅ *Decidido*). Decisões que mudarem depois devem ser registradas no [Histórico de decisões](#-histórico-de-decisões).
 
@@ -147,7 +147,7 @@ Este documento reúne as decisões tomadas para reconstruir o **Controle Finance
 | F3 | Acesso ao banco | **Drizzle ORM + Server Actions**. Schema e migrações versionados no repositório, regras de negócio no servidor e **RLS** no Supabase como segunda camada de segurança |
 | F4 | Interface | **Tailwind CSS + shadcn/ui**. Gráficos em **SVG próprio** (sem biblioteca; ver histórico de 14/11). Cores: receita = azul, despesa = vermelho (par validado para daltonismo), com degraus próprios no modo escuro |
 | F5 | Testes | **Só unitários (Vitest)**, focados na lógica de domínio: recorrências, saldos e centavos |
-| F6 | Ambiente de desenvolvimento | **Tudo local primeiro**: Next.js em `localhost` e **Supabase CLI local** (Docker Desktop), com Postgres, Auth, Mailpit e Studio. O deploy na Vercel e no Supabase na nuvem só acontece depois de validar localmente; a troca é feita apenas pelas variáveis de ambiente |
+| F6 | Ambiente de desenvolvimento | **Tudo local primeiro**: Next.js em `localhost` e **Supabase CLI local** (Docker), com Postgres, Auth e Mailpit; o painel Studio e os serviços não usados ficam desligados para economizar memória. O deploy na Vercel e no Supabase na nuvem só acontece depois de validar localmente; a troca é feita apenas pelas variáveis de ambiente |
 
 ---
 
