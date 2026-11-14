@@ -68,7 +68,9 @@ src/
     (app)/           área logada: lancamentos, dashboard, relatorios, categorias, dados
                      (abas no topo a partir de tablet; barra inferior no celular)
     auth/confirm/    destino dos links enviados por e-mail (token_hash → sessão)
-  db/                schema Drizzle (tabelas, RLS) e conexão
+  db/                schema Drizzle (tabelas, RLS), conexão e checagem de tipos schema ↔ domínio
+  domain/            regras de negócio puras (sem banco/React), todas com testes:
+                     datas, recorrências, ocorrências, edição de séries, saldos e orçamento
   lib/               auth (requireUser), clientes Supabase, dinheiro em centavos
   proxy.ts           renova a sessão e redireciona quem não está logado
 supabase/
@@ -76,6 +78,8 @@ supabase/
   migrations/        SQL gerado pelo Drizzle
   templates/         e-mails de confirmação e recuperação (pt-BR)
 ```
+
+**Recorrências:** uma série é uma regra (início, frequência, dia de vencimento, fim opcional, exclusões), não cópias mês a mês. Uma ocorrência editada "só esta" vira uma linha em `transactions` que substitui a calculada. As edições "deste em diante" e "toda a série" são planejadas em `src/domain/series-edit.ts` como uma lista ordenada de operações, executada numa única transação.
 
 **Segurança:** o servidor acessa o banco via Drizzle e **sempre filtra por `user_id`** do `requireUser()`. A RLS do Supabase (cada usuário só acessa as próprias linhas) é a segunda camada.
 
