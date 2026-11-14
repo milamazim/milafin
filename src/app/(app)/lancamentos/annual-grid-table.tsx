@@ -44,7 +44,7 @@ export function AnnualGridTable({
                   colSpan={14}
                   className={cn(
                     "sticky left-0 bg-background px-3 pt-4 pb-1 text-left text-xs font-semibold tracking-wide uppercase",
-                    section.kind === "receita" ? "text-emerald-700 dark:text-emerald-400" : "text-rose-700 dark:text-rose-400",
+                    section.kind === "receita" ? "text-receita-ink" : "text-despesa-ink",
                   )}
                 >
                   {section.label}
@@ -155,7 +155,7 @@ function BalanceRow({
   total?: number;
   colClass: (m: number) => string | undefined;
 }) {
-  const tone = (v: number) => (v < 0 ? "text-rose-700 dark:text-rose-400" : v > 0 ? "text-emerald-700 dark:text-emerald-400" : "");
+  const tone = (v: number) => (v < 0 ? "text-despesa-ink" : v > 0 ? "text-receita-ink" : "");
   return (
     <tr className="border-b font-semibold">
       <th scope="row" className="sticky left-0 z-10 bg-background px-3 py-2 text-left">

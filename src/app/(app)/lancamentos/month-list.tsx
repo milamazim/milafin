@@ -134,7 +134,7 @@ export function MonthList({
                     <span
                       className={cn(
                         "text-sm font-medium whitespace-nowrap tabular-nums",
-                        receita ? "text-emerald-700 dark:text-emerald-400" : "text-rose-700 dark:text-rose-400",
+                        receita ? "text-receita-ink" : "text-despesa-ink",
                         o.paid && "opacity-60",
                       )}
                     >
@@ -158,7 +158,7 @@ function Stat({ label, value, sub, tone }: { label: string; value: number; sub: 
       <p
         className={cn(
           "truncate text-sm font-semibold tabular-nums sm:text-lg",
-          tone === "pos" ? "text-emerald-700 dark:text-emerald-400" : "text-rose-700 dark:text-rose-400",
+          tone === "pos" ? "text-receita-ink" : "text-despesa-ink",
         )}
       >
         {formatBRL(value)}
